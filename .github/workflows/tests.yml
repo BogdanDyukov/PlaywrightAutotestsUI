@@ -41,7 +41,7 @@ jobs:
           key: ${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}
       - run: playwright install --with-deps
         if: steps.playwright-cache.outputs.cache-hit != 'true'
-      - run: playwright install-deps
+      - run: playwright install-deps webkit
 #        if: steps.playwright-cache.outputs.cache-hit != 'true'
 
 #      - name: Install browsers
