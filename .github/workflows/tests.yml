@@ -30,12 +30,12 @@ jobs:
           playwright install --with-deps
 
       - name: Run Playwright tests with pytest and generate Allure results
+        continue-on-error: true
         run: |
           pytest -m regression --alluredir=allure-results --numprocesses 2
 
       - name: Upload Allure results as artifact
         uses: actions/upload-artifact@v4
-        if: always()
         with:
           name: allure-results
           path: allure-results
@@ -53,21 +53,17 @@ jobs:
 
       - name: Get Allure history
         uses: actions/checkout@v4
-        if: always()
-        continue-on-error: true
         with:
           ref: gh-pages
           path: gh-pages
 
       - name: Generates Allure Report with history
         uses: simple-elf/allure-report-action@master
-        if: always()
         with:
           allure_results: allure-results
           allure_history: allure-history
 
       - name: Deploy report to Github Pages
-        if: always()
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
