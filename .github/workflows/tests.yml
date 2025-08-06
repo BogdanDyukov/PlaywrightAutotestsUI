@@ -38,10 +38,9 @@ jobs:
           path: |
             ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}
-      - run: npm ci
-      - run: npx playwright install --with-deps
+      - run: playwright install --with-deps
         if: steps.playwright-cache.outputs.cache-hit != 'true'
-      - run: npx playwright install-deps
+      - run: playwright install-deps
         if: steps.playwright-cache.outputs.cache-hit != 'true'
 
 #      - name: Install browsers
