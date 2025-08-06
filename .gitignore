@@ -1,4 +1,20 @@
-venv
-.pytest_cache
+# pycharm
 .idea
+
+# python
 __pycache__
+.pytest_cache
+venv
+
+# allure
+allure-results
+allure-report
+
+# testing artifacts
+*.html
+*.json
+videos
+tracing
+
+# secret data
+.env.secret
