@@ -18,15 +18,16 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4  # Используем GitHub Action для установки Python
+        uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: '3.13'
           cache: 'pip' # caching pip dependencies
 
       - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-          playwright install --with-deps
+        run: pip install -r requirements.txt
+
+      - name: Install browsers
+        run: playwright install --with-deps
 
       - name: Run Playwright tests with pytest and generate Allure results
         run: |
