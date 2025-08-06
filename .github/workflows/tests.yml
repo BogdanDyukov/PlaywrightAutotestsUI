@@ -35,8 +35,8 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: Allure results artifact
-          path: allure-results
+          name: allure-results
+          path: allure-results/
 
   publish-report:
     runs-on: ubuntu-latest
@@ -47,7 +47,8 @@ jobs:
       - name: Download Allure results artifact
         uses: actions/download-artifact@v4
         with:
-          name: Allure results artifact
+          name: allure-results
+          path: allure-results/
 
       - name: Get Allure history
         uses: actions/checkout@v4
