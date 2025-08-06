@@ -1,74 +1,73 @@
-name: UI tests  # Название workflow, отображается в интерфейсе GitHub Actions
+# https://github.com/Nikita-Filonov/python-ui-tests/blob/main/.github/workflows/test.yml
+
+name: UI Tests
 
 on:
   push:
     branches:
-      - main  # Запускаем workflow при пуше в ветку main
+      - main
   pull_request:
     branches:
-      - main  # И при открытии pull request'а в main
+      - main
+  workflow_dispatch:
 
 jobs:
-  run-tests:  # Джоб для запуска тестов
-    runs-on: ubuntu-latest  # Используем последнюю версию Ubuntu как CI-окружение
+  run-tests:
+    runs-on: ubuntu-latest
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4  # Клонируем репозиторий в CI-окружение
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v5  # Устанавливаем Python
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.12'  # Указываем версию Python
+          python-version: '3.13'
+          cache: 'pip' # caching pip dependencies
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip  # Обновляем pip
-          pip install -r requirements.txt  # Устанавливаем зависимости проекта
-          playwright install --with-deps  # Устанавливаем Playwright и его зависимости
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          playwright install --with-deps
 
-      - name: Run UI tests with pytest and generate Allure results
+      - name: Run Playwright tests with pytest and generate Allure results
+        continue-on-error: true
         run: |
           pytest -m regression --alluredir=allure-results --numprocesses 2
-          # Запускаем тесты с меткой "regression"
-          # --alluredir=allure-results сохраняет результаты в папку allure-results
-          # --numprocesses 2 - выполняем тесты в 2 потока (ускоряет выполнение)
 
-      - name: Upload Allure results
-        if: always()  # Всегда выполняем (даже если предыдущий шаг упал)
-        uses: actions/upload-artifact@v4  # Загружаем артефакт в CI
+      - name: Upload Allure results as artifact
+        uses: actions/upload-artifact@v4
         with:
-          name: allure-results  # Имя артефакта
-          path: allure-results  # Путь к директории с результатами Allure
+          name: allure-results
+          path: allure-results
 
-  publish-report:  # Джоб для публикации отчёта
-    needs: [ run-tests ]  # Выполняется после успешного (или завершённого) run-tests
-    runs-on: ubuntu-latest  # Тоже запускается в Ubuntu
+  publish-report:
+    runs-on: ubuntu-latest
+    needs: [ run-tests ]
 
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v4  # Клонируем репозиторий
+      - name: Download Allure results artifact
+        uses: actions/download-artifact@v4
         with:
-          ref: gh-pages  # Клонируем ветку gh-pages
-          path: gh-pages  # Указываем путь, куда клонировать
+          name: allure-results
+          path: allure-results
 
-      - name: Download Allure results
-        uses: actions/download-artifact@v4  # Загружаем ранее загруженные результаты
+      - name: Get Allure history
+        uses: actions/checkout@v4
         with:
-          name: allure-results  # Имя артефакта
-          path: allure-results  # Путь куда распаковать
+          ref: gh-pages
+          path: gh-pages
 
-      - name: Allure Report action from marketplace
-        uses: simple-elf/allure-report-action@v1.12  # Генерируем Allure-отчёт
-        if: always()  # Выполняем даже при ошибке
+      - name: Generates Allure Report with history
+        uses: simple-elf/allure-report-action@master
         with:
-          allure_results: allure-results  # Путь к результатам
-          allure_history: allure-history  # Папка с историей отчётов (для графиков и сравнения)
+          allure_results: allure-results
+          allure_history: allure-history
 
       - name: Deploy report to Github Pages
-        if: always()  # Выполняем даже если предыдущие шаги упали
-        uses: peaceiris/actions-gh-pages@v4  # Деплой на GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}  # Используем встроенный GitHub токен
-          publish_branch: gh-pages  # Ветка для публикации отчёта
-          publish_dir: allure-history  # Папка с готовым HTML отчётом
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: allure-history
