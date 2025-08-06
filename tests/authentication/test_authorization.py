@@ -67,7 +67,6 @@ class TestAuthorization:
         dashboard_page.dashboard_toolbar_view.check_visible()
         dashboard_page.navbar.check_visible(settings.test_user.username)
         dashboard_page.sidebar.check_visible()
-        assert False
 
     @allure.tag(AllureTag.NAVIGATION)
     @allure.title("Navigation from login page to registration page")
