@@ -41,7 +41,7 @@ jobs:
       - run: playwright install --with-deps
         if: steps.playwright-cache.outputs.cache-hit != 'true'
       - run: playwright install-deps
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
+#        if: steps.playwright-cache.outputs.cache-hit != 'true'
 
 #      - name: Install browsers
 #        run: playwright install --with-deps
